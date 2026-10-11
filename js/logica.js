@@ -95,24 +95,108 @@ export function generarId(participantes) {
     return null;
 }
 
-// Devuelve la clasificación de la edad para mostrarla en la tarjeta.
-export function obtenerClasificacionEdad(participante) {
-    const edad = participante.edad;
-
+// Devuelve si la persona es menor o mayor de edad.
+export function obtenerClasificacionEdad(edad) {
     if (edad < 18) {
         return "Menor de edad";
-    } else {
-        return "Mayor de edad";
     }
+    return "Mayor de edad";
 }
 
-// Devuelve la clasificación según los años de experiencia.
-export function obtenerClasificacionExperiencia(participante) {
-    if (participante.experiencia < 4) {
+// Devuelve el nivel de experiencia según los años.
+export function obtenerClasificacionExperiencia(experiencia) {
+    if (experiencia < 4) {
         return "Inicial";
-    } else if (participante.experiencia < 7) {
+    } else if (experiencia < 7) {
         return "Intermedia";
-    } else {
-        return "Avanzada";
     }
+    return "Avanzada";
+}
+
+// Filtra los participantes por nombre.
+export function filtrarPorNombre(lista, nombre) {
+    const resultado = [];
+
+    for (const participante of lista) {
+        if (participante.nombre.toLowerCase().includes(nombre.toLowerCase())) {
+            resultado.push(participante);
+        }
+    }
+
+    return resultado;
+}
+
+// Filtra los participantes por modalidad.
+export function filtrarPorModalidad(lista, modalidad) {
+    const resultado = [];
+
+    for (const participante of lista) {
+        if (participante.modalidad.toLowerCase() === modalidad.toLowerCase()) {
+            resultado.push(participante);
+        }
+    }
+
+    return resultado;
+}
+
+// Cuenta cuántos inscritos hay.
+export function totalInscritos(lista) {
+    let total = 0;
+
+    for (const participante of lista) {
+        total++;
+    }
+
+    return total;
+}
+
+// Calcula el porcentaje de un tipo respecto al total.
+export function porcentajePorTipo(lista, tipo) {
+    const total = totalInscritos(lista);
+
+    if (total === 0) {
+        return 0;
+    }
+
+    let cantidad = 0;
+
+    for (const participante of lista) {
+        if (participante.tipo.toLowerCase() === tipo.toLowerCase()) {
+            cantidad++;
+        }
+    }
+
+    return (cantidad / total) * 100;
+}
+
+// Calcula la experiencia media del grupo.
+export function experienciaMedia(lista) {
+    if (lista.length === 0) {
+        return 0;
+    }
+
+    let total = 0;
+
+    for (const participante of lista) {
+        total += participante.experiencia;
+    }
+
+    return total / lista.length;
+}
+
+// Devuelve el participante con más experiencia.
+export function participanteVeterano(lista) {
+    if (lista.length === 0) {
+        return null;
+    }
+
+    let veterano = lista[0];
+
+    for (const participante of lista) {
+        if (participante.experiencia > veterano.experiencia) {
+            veterano = participante;
+        }
+    }
+
+    return veterano;
 }

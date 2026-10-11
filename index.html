@@ -13,6 +13,7 @@
     </header>
 
     <main>
+        <!-- Formulario de Inscripción -->
         <section>
             <h2>Formulario de Inscripción</h2>
             <form id="formulario">
@@ -43,8 +44,39 @@
             <div id="errores"></div>
         </section>
 
+        <!-- Búsqueda y Filtros -->
+        <section>
+            <h2>Buscar participantes</h2>
+            <label for="busqueda">Buscar por nombre:</label>
+            <input type="text" id="busqueda" placeholder="Escribe un nombre">
+
+            <label for="filtro-modalidad">Filtrar por modalidad:</label>
+            <select id="filtro-modalidad">
+                <option value="todas">Todas</option>
+                <option value="presencial">Presencial</option>
+                <option value="online">Online</option>
+            </select>
+        </section>
+
+        <!-- Panel de Estadísticas (Añadido) -->
+        <section id="estadisticas">
+            <h2>Estadísticas del Evento</h2>
+            <p>Total inscritos: <span id="stat-total">0</span></p>
+            <p>Porcentajes por tipo: <span id="stat-porcentajes">Estudiantes: 0%, Profesionales: 0%, Invitados: 0%</span></p>
+            <p>Experiencia media (Presencial): <span id="stat-exp-presencial">0 años</span></p>
+            <p>Participante más veterano/a: <span id="stat-veterano">Ninguno</span></p>
+        </section>
+
+        <!-- Listado de Tarjetas -->
         <section id="tarjetas">
             <h2>Participantes Inscritos</h2>
+        </section>
+
+        <!-- Gestión de JSON y Persistencia (Añadido para Fase 4 y 5) -->
+        <section id="gestion-datos">
+            <h2>Gestión de Datos</h2>
+            <button id="btn-exportar">Exportar a JSON</button>
+            <input type="file" id="input-importar" accept=".json">
         </section>
     </main>
 </body>
