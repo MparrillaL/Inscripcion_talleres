@@ -6,7 +6,9 @@ import {
     obtenerClasificacionEdad,
     obtenerClasificacionExperiencia,
     filtrarPorNombre,
-    filtrarPorModalidad
+    filtrarPorModalidad,
+    guardarEnStorage,
+    validarColeccionImportada,
 } from './logica.js';
 
 const formulario = document.querySelector('#formulario');
@@ -14,11 +16,25 @@ const contenedorTarjetas = document.querySelector('#tarjetas');
 const contenedorErrores = document.querySelector('#errores');
 const inputBusqueda = document.querySelector('#busqueda');
 const selectModalidad = document.querySelector('#filtro-modalidad');
+const btnExportar = document.querySelector('#btn-exportar');
+const inputImportar = document.querySelector('#input-importar');
+const jsonArea = document.querySelector('#json-area');
+const btnImportarTexto = document.querySelector('#btn-importar-texto');
+const mensajeJSON = document.querySelector('#json-mensaje');
+const selectTema = document.querySelector('#tema');
+const selectTamano = document.querySelector('#tamano');
+const btnGuardarPreferencias = document.querySelector('#guardar-preferencias');
+const btnRestablecerPreferencias = document.querySelector('#reset-preferencias');
 
 const statTotal = document.querySelector('#stat-total');
 const statPorcentajes = document.querySelector('#stat-porcentajes');
 const statExpPresencial = document.querySelector('#stat-exp-presencial');
 const statVeterano = document.querySelector('#stat-veterano');
+
+const STORAGE_KEYS = {
+    tema: 'dwc_tema',
+    tamano: 'dwc_tamano'
+};
 
 // Las tarjetas se renderizan dentro de este contenedor para conservar el título.
 const listaTarjetas = document.createElement('div');
@@ -138,6 +154,150 @@ function aplicarFiltros() {
     renderLista(resultado);
 }
 
+function aplicarTema(tema) {
+    const valor = tema === 'oscuro' ? 'oscuro' : 'claro';
+    document.body.dataset.theme = valor;
+    document.body.classList.toggle('tema-oscuro', valor === 'oscuro');
+    if (selectTema) {
+        selectTema.value = valor;
+    }
+}
+
+function aplicarTamano(tamano) {
+    const valor = tamano === 'grande' ? 'grande' : 'normal';
+    document.body.dataset.size = valor;
+    document.body.classList.toggle('tamano-grande', valor === 'grande');
+    if (selectTamano) {
+        selectTamano.value = valor;
+    }
+}
+
+function leerCookie(nombre) {
+    const cookies = document.cookie ? document.cookie.split('; ') : [];
+    for (const cookie of cookies) {
+        const [clave, valor] = cookie.split('=');
+        if (clave === nombre) {
+            return decodeURIComponent(valor);
+        }
+    }
+    return '';
+}
+
+function guardarCookie(nombre, valor, dias = 30) {
+    const secure = location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `${nombre}=${encodeURIComponent(valor)}; Path=/; SameSite=Lax; Max-Age=${dias * 86400}${secure}`;
+}
+
+function borrarCookie(nombre) {
+    document.cookie = `${nombre}=; Path=/; SameSite=Lax; Max-Age=0`;
+}
+
+function cargarPreferencias() {
+    let tema = 'claro';
+    let tamano = 'normal';
+
+    try {
+        const temaLocal = localStorage.getItem(STORAGE_KEYS.tema);
+        const tamanoLocal = localStorage.getItem(STORAGE_KEYS.tamano);
+
+        if (temaLocal === 'oscuro' || temaLocal === 'claro') {
+            tema = temaLocal;
+        } else {
+            const temaCookie = leerCookie('tema');
+            if (temaCookie === 'oscuro' || temaCookie === 'claro') {
+                tema = temaCookie;
+            }
+        }
+
+        if (tamanoLocal === 'grande' || tamanoLocal === 'normal') {
+            tamano = tamanoLocal;
+        } else {
+            const tamanoCookie = leerCookie('tamano');
+            if (tamanoCookie === 'grande' || tamanoCookie === 'normal') {
+                tamano = tamanoCookie;
+            }
+        }
+    } catch (error) {
+        console.warn('No se pudieron leer las preferencias guardadas:', error);
+    }
+
+    aplicarTema(tema);
+    aplicarTamano(tamano);
+}
+
+function guardarPreferencias() {
+    try {
+        localStorage.setItem(STORAGE_KEYS.tema, selectTema.value);
+        localStorage.setItem(STORAGE_KEYS.tamano, selectTamano.value);
+        guardarCookie('tema', selectTema.value, 30);
+        guardarCookie('tamano', selectTamano.value, 30);
+        aplicarTema(selectTema.value);
+        aplicarTamano(selectTamano.value);
+    } catch (error) {
+        console.warn('No se pudieron guardar las preferencias:', error);
+    }
+}
+
+function resetearPreferencias() {
+    try {
+        localStorage.removeItem(STORAGE_KEYS.tema);
+        localStorage.removeItem(STORAGE_KEYS.tamano);
+    } catch (error) {
+        console.warn('No se pudieron borrar las preferencias del almacenamiento:', error);
+    }
+
+    borrarCookie('tema');
+    borrarCookie('tamano');
+    aplicarTema('claro');
+    aplicarTamano('normal');
+}
+
+function exportarParticipantes() {
+    const jsonString = JSON.stringify(participantes, null, 2);
+    jsonArea.value = jsonString;
+}
+
+function mostrarMensajeJSON(texto, esError) {
+    mensajeJSON.textContent = texto;
+    mensajeJSON.classList.toggle('error', esError);
+}
+
+function importarParticipantesDesdeJSON(texto) {
+    let datos;
+
+    try {
+        datos = JSON.parse(texto);
+    } catch (error) {
+        mostrarMensajeJSON('JSON mal formado: revisa comas, comillas y llaves.', true);
+        return;
+    }
+
+    const mensajeError = validarColeccionImportada(datos);
+    if (mensajeError !== null) {
+        mostrarMensajeJSON(`Importación rechazada. ${mensajeError}`, true);
+        return;
+    }
+
+    // Solo se llega aquí si todo es válido, así que no hay importaciones parciales.
+    participantes.length = 0;
+    for (const participante of datos) {
+        participantes.push({
+            id: participante.id,
+            nombre: participante.nombre.trim(),
+            edad: participante.edad,
+            tipo: participante.tipo.trim().toLowerCase(),
+            modalidad: participante.modalidad.trim().toLowerCase(),
+            experiencia: participante.experiencia,
+            fechaInscripcion: participante.fechaInscripcion
+        });
+    }
+
+    guardarEnStorage();
+    aplicarFiltros();
+    exportarParticipantes();
+    mostrarMensajeJSON(`Importación correcta: ${participantes.length} participantes.`, false);
+}
+
 formulario.addEventListener('submit', event => {
     event.preventDefault();
 
@@ -166,12 +326,37 @@ formulario.addEventListener('submit', event => {
         experiencia: participanteNormalizado.experiencia
     });
 
+    guardarEnStorage();
     contenedorErrores.textContent = '';
     formulario.reset();
     aplicarFiltros();
 });
 
+btnExportar.addEventListener('click', () => {
+    exportarParticipantes();
+    mostrarMensajeJSON('Colección exportada al área de texto.', false);
+});
+btnImportarTexto.addEventListener('click', () => importarParticipantesDesdeJSON(jsonArea.value));
+
+inputImportar.addEventListener('change', event => {
+    const archivo = event.target.files[0];
+    if (!archivo) {
+        return;
+    }
+
+    const lector = new FileReader();
+    lector.onload = () => importarParticipantesDesdeJSON(String(lector.result));
+    lector.onerror = () => {
+        mostrarMensajeJSON('No se pudo leer el archivo.', true);
+    };
+    lector.readAsText(archivo);
+    inputImportar.value = '';
+});
+
 inputBusqueda.addEventListener('input', aplicarFiltros);
 selectModalidad.addEventListener('change', aplicarFiltros);
+btnGuardarPreferencias.addEventListener('click', guardarPreferencias);
+btnRestablecerPreferencias.addEventListener('click', resetearPreferencias);
 
+cargarPreferencias();
 renderLista();

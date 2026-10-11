@@ -72,11 +72,37 @@
             <h2>Participantes Inscritos</h2>
         </section>
 
-        <!-- Gestión de JSON y Persistencia (Añadido para Fase 4 y 5) -->
+        <!-- Gestión de JSON y Persistencia -->
         <section id="gestion-datos">
             <h2>Gestión de Datos</h2>
-            <button id="btn-exportar">Exportar a JSON</button>
-            <input type="file" id="input-importar" accept=".json">
+            <textarea id="json-area" rows="8" placeholder="Exporta o importa un JSON aquí..."></textarea>
+            <div class="acciones-json">
+                <button id="btn-exportar" type="button">Exportar a JSON</button>
+                <button id="btn-importar-texto" type="button">Importar desde el área de texto</button>
+                <label class="btn-importar" for="input-importar">Importar desde archivo</label>
+                <input type="file" id="input-importar" accept=".json" hidden>
+            </div>
+            <p id="json-mensaje" role="status"></p>
+        </section>
+
+        <section id="preferencias">
+            <h2>Preferencias</h2>
+            <label for="tema">Tema:</label>
+            <select id="tema">
+                <option value="claro">Claro</option>
+                <option value="oscuro">Oscuro</option>
+            </select>
+
+            <label for="tamano">Tamaño de letra:</label>
+            <select id="tamano">
+                <option value="normal">Normal</option>
+                <option value="grande">Grande</option>
+            </select>
+
+            <div class="acciones-preferencias">
+                <button id="guardar-preferencias" type="button">Guardar preferencias</button>
+                <button id="reset-preferencias" type="button" class="btn-secundario">Restablecer</button>
+            </div>
         </section>
     </main>
 </body>

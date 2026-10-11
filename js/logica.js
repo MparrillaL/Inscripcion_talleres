@@ -1,6 +1,8 @@
 
+const CLAVE_STORAGE = "participantes_talleres"
+
 // Array inicial con tres participantes para que haya datos al cargar la página.
-export const participantes = [
+export const participantesPorDefecto = [
     {
         id: 483721,
         nombre: "Ana García",
@@ -47,6 +49,11 @@ export function validarParticipante(datos) {
 
     const participanteNormalizado = normalizarParticipante(datos);
 
+    // Number("") vale 0, así que las cadenas vacías se rechazan antes de convertir.
+    if (datos.edad.trim() === "" || datos.experiencia.trim() === "") {
+        esValido = false;
+    }
+
     // El nombre debe tener entre 2 y 60 caracteres.
     if (participanteNormalizado.nombre.length < 2 || participanteNormalizado.nombre.length > 60) {
         esValido = false;
@@ -73,6 +80,62 @@ export function validarParticipante(datos) {
     }
 
     return esValido;
+}
+
+// Valida una colección importada: devuelve el mensaje de error o null si es correcta.
+export function validarColeccionImportada(datos) {
+    if (!Array.isArray(datos)) {
+        return "El JSON debe ser un array de participantes.";
+    }
+
+    const idsVistos = new Set();
+
+    for (let i = 0; i < datos.length; i++) {
+        const elemento = datos[i];
+        const prefijo = `Participante ${i + 1}: `;
+
+        if (elemento === null || typeof elemento !== "object" || Array.isArray(elemento)) {
+            return prefijo + "no es un objeto.";
+        }
+
+        if (typeof elemento.nombre !== "string" || typeof elemento.tipo !== "string" ||
+            typeof elemento.modalidad !== "string" || typeof elemento.fechaInscripcion !== "string") {
+            return prefijo + "faltan campos de texto o tienen un tipo incorrecto.";
+        }
+
+        if (typeof elemento.id !== "number" || typeof elemento.edad !== "number" ||
+            typeof elemento.experiencia !== "number") {
+            return prefijo + "faltan campos numéricos o tienen un tipo incorrecto.";
+        }
+
+        const datosFormulario = {
+            nombre: elemento.nombre,
+            edad: String(elemento.edad),
+            tipo: elemento.tipo,
+            modalidad: elemento.modalidad,
+            experiencia: String(elemento.experiencia)
+        };
+
+        if (!validarParticipante(datosFormulario)) {
+            return prefijo + "algún valor está fuera de rango o no está permitido.";
+        }
+
+        if (!Number.isInteger(elemento.id) || elemento.id < 100000 || elemento.id > 999999) {
+            return prefijo + "el id debe ser un entero entre 100000 y 999999.";
+        }
+
+        if (idsVistos.has(elemento.id)) {
+            return prefijo + "el id está repetido.";
+        }
+        idsVistos.add(elemento.id);
+
+        const fecha = new Date(elemento.fechaInscripcion);
+        if (Number.isNaN(fecha.getTime()) || fecha.toISOString() !== elemento.fechaInscripcion) {
+            return prefijo + "la fecha no es un texto ISO válido.";
+        }
+    }
+
+    return null;
 }
 
 // Genera un identificador aleatorio y único para cada participante.
@@ -200,3 +263,21 @@ export function participanteVeterano(lista) {
 
     return veterano;
 }
+export function cargarDeStorage() {
+    const datos = localStorage.getItem(CLAVE_STORAGE);
+    if (datos) {
+        try {
+            return JSON.parse(datos);
+        } catch (e) {
+            console.error("Error al parsear los datos del storage", e);
+        }
+    }
+    return participantesPorDefecto;
+}
+
+export const participantes = cargarDeStorage();
+
+export function guardarEnStorage() {
+    localStorage.setItem(CLAVE_STORAGE, JSON.stringify(participantes));
+}
+
