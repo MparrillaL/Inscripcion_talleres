@@ -1,0 +1,149 @@
+:root {
+    --fondo: #f2f2f2;
+    --panel: #ffffff;
+    --texto: #222222;
+    --texto-suave: #555555;
+    --borde: #d9d9d9;
+    --primario: #444444;
+    --primario-oscuro: #2d2d2d;
+    --rojo: #b33a3a;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--fondo);
+    color: var(--texto);
+}
+
+header {
+    background: #eaeaea;
+    border-bottom: 1px solid var(--borde);
+    padding: 1.5rem 1rem;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    color: var(--texto);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+}
+
+main {
+    width: min(1000px, 90%);
+    margin: 2rem auto;
+    display: grid;
+    gap: 1.5rem;
+}
+
+main section {
+    background: var(--panel);
+    border: 1px solid var(--borde);
+    border-radius: 0;
+    padding: 1.5rem;
+}
+
+h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    color: var(--texto);
+}
+
+form {
+    display: grid;
+    gap: 0.9rem;
+}
+
+label {
+    font-weight: 600;
+    color: var(--texto);
+}
+
+input,
+select,
+button {
+    font: inherit;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 0.75rem 0.8rem;
+    border: 1px solid var(--borde);
+    background: #fff;
+    color: var(--texto);
+}
+
+button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 46px;
+    border: none;
+    background: var(--primario);
+    color: #fff;
+    padding: 0.9rem 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    line-height: 1;
+}
+
+button:hover {
+    background: var(--primario-oscuro);
+}
+
+#errores {
+    margin-top: 1rem;
+    color: var(--rojo);
+    min-height: 1.2rem;
+    font-weight: 600;
+}
+
+#tarjetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1rem;
+}
+
+.tarjeta {
+    background: #fafafa;
+    border: 1px solid var(--borde);
+    padding: 1rem;
+}
+
+.tarjeta h3 {
+    margin: 0 0 0.6rem;
+    font-size: 1.1rem;
+}
+
+.tarjeta p {
+    margin: 0.4rem 0;
+    color: var(--texto-suave);
+    line-height: 1.5;
+}
+
+.tarjeta button {
+    width: 100%;
+    margin-top: 0.8rem;
+    background: var(--rojo);
+}
+
+.tarjeta button:hover {
+    background: #9a2d2d;
+}
+
+@media (min-width: 700px) {
+    form {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    form button {
+        grid-column: 1 / -1;
+    }
+}
+

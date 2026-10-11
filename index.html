@@ -1,14 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscripción Talleres</title>
-    <link rel="stylesheet" href="/css/estilos.css">
-    <script src="/js/logica.js" defer></script>
-    <script src="/js/app.js" defer></script> // depende de logica.js
+    <link rel="stylesheet" href="./css/estilos.css">
+    <script type="module" src="./js/app.js"></script>
 </head>
 <body>
+    <header>
+        <h1>Inscripción a Talleres</h1>
+    </header>
 
+    <main>
+        <section>
+            <h2>Formulario de Inscripción</h2>
+            <form id="formulario">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" required>
+
+                <label for="edad">Edad:</label>
+                <input type="number" id="edad" name="edad" required>
+
+                <label for="tipo">Tipo:</label>
+                <select id="tipo" name="tipo" required>
+                    <option value="estudiante">Estudiante</option>
+                    <option value="profesional">Profesional</option>
+                    <option value="invitado">Invitado</option>
+                </select>
+
+                <label for="modalidad">Modalidad:</label>
+                <select id="modalidad" name="modalidad" required>
+                    <option value="presencial">Presencial</option>
+                    <option value="online">Online</option>
+                </select>
+
+                <label for="experiencia">Experiencia (años):</label>
+                <input type="number" id="experiencia" name="experiencia" required>
+
+                <button type="submit">Inscribirse</button>
+            </form>
+            <div id="errores"></div>
+        </section>
+
+        <section id="tarjetas">
+            <h2>Participantes Inscritos</h2>
+        </section>
+    </main>
 </body>
 </html>
