@@ -4,31 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor de participantes del evento</title>
+    <!-- Hoja de estilos y script principal (type="module" para poder usar import) -->
     <link rel="stylesheet" href="./css/estilos.css">
     <script type="module" src="./js/app.js"></script>
 </head>
 <body>
+    <!-- Cabecera con el título de la página -->
     <header>
         <h1>Gestor de participantes del evento</h1>
     </header>
 
+    <!-- Contenido principal dividido en secciones -->
     <main>
         <!-- Alta de participantes: la validación la hace JavaScript, por eso novalidate -->
         <section>
             <h2>Formulario de inscripción</h2>
             <form id="formulario" novalidate>
+                <!-- Nombre: texto libre; el span muestra su error -->
                 <div class="campo">
                     <label for="nombre">Nombre:</label>
                     <input type="text" id="nombre" name="nombre" autocomplete="off">
                     <span class="error-campo" id="error-nombre" role="alert"></span>
                 </div>
 
+                <!-- Edad: se usa texto para validar nosotros que sea un entero -->
                 <div class="campo">
                     <label for="edad">Edad:</label>
                     <input type="text" id="edad" name="edad" inputmode="numeric" autocomplete="off">
                     <span class="error-campo" id="error-edad" role="alert"></span>
                 </div>
 
+                <!-- Tipo de participante -->
                 <div class="campo">
                     <label for="tipo">Tipo:</label>
                     <select id="tipo" name="tipo">
@@ -39,6 +45,7 @@
                     <span class="error-campo" id="error-tipo" role="alert"></span>
                 </div>
 
+                <!-- Modalidad de asistencia -->
                 <div class="campo">
                     <label for="modalidad">Modalidad:</label>
                     <select id="modalidad" name="modalidad">
@@ -48,14 +55,17 @@
                     <span class="error-campo" id="error-modalidad" role="alert"></span>
                 </div>
 
+                <!-- Experiencia en años (puede llevar decimales) -->
                 <div class="campo">
                     <label for="experiencia">Experiencia (años, con punto decimal):</label>
                     <input type="text" id="experiencia" name="experiencia" inputmode="decimal" autocomplete="off">
                     <span class="error-campo" id="error-experiencia" role="alert"></span>
                 </div>
 
+                <!-- Botón que envía el formulario -->
                 <button type="submit">Inscribirse</button>
             </form>
+            <!-- Resumen de errores del formulario -->
             <div id="errores" role="alert"></div>
         </section>
 
@@ -75,6 +85,12 @@
                     <option value="online">Online</option>
                 </select>
             </div>
+
+            <!-- Localiza al primer menor de edad de la colección -->
+            <div class="acciones">
+                <button id="btn-primer-menor" type="button">Buscar primer menor de edad</button>
+            </div>
+            <p id="primer-menor-mensaje" role="status"></p>
         </section>
 
         <!-- Estadísticas de la colección completa -->
@@ -97,7 +113,9 @@
         <!-- Listado de tarjetas -->
         <section id="tarjetas">
             <h2>Participantes inscritos</h2>
+            <!-- Aviso cuando no hay resultados (oculto por defecto) -->
             <p id="sin-resultados" role="status" hidden></p>
+            <!-- Aquí app.js añade una tarjeta por participante -->
             <div id="lista-participantes" class="lista-participantes"></div>
         </section>
 
@@ -112,6 +130,7 @@
             <h2>Gestión de datos (JSON)</h2>
             <label for="json-area">Colección en formato JSON:</label>
             <textarea id="json-area" rows="8" placeholder="Pulsa Exportar o pega aquí un JSON para importarlo"></textarea>
+            <!-- Botones de exportar e importar; el input de archivo va oculto y se usa con su label -->
             <div class="acciones">
                 <button id="btn-exportar" type="button">Exportar a JSON</button>
                 <button id="btn-importar-texto" type="button">Importar desde el área de texto</button>
@@ -124,6 +143,7 @@
         <!-- Preferencias guardadas en cookies -->
         <section id="preferencias">
             <h2>Preferencias</h2>
+            <!-- Selectores de tema y tamaño de letra -->
             <div class="campo">
                 <label for="tema">Tema:</label>
                 <select id="tema">
@@ -140,6 +160,7 @@
                 </select>
             </div>
 
+            <!-- Botones para guardar o borrar las cookies -->
             <div class="acciones">
                 <button id="guardar-preferencias" type="button">Guardar preferencias</button>
                 <button id="reset-preferencias" type="button" class="btn-secundario">Restablecer</button>
@@ -150,6 +171,7 @@
         <!-- Ayuda en ventana aparte -->
         <section id="ayuda">
             <h2>Ayuda</h2>
+            <!-- Botones para abrir y cerrar la ventana de ayuda -->
             <div class="acciones">
                 <button id="btn-abrir-ayuda" type="button">Abrir ayuda</button>
                 <button id="btn-cerrar-ayuda" type="button" class="btn-secundario">Cerrar ayuda</button>

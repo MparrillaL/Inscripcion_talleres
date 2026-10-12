@@ -1,3 +1,4 @@
+/* Colores y sombra del tema claro (por defecto), guardados en variables. */
 :root {
     --fondo: #f5f4ef;
     --fondo-suave: #f7f8f5;
@@ -36,10 +37,12 @@
     font-size: 125%;
 }
 
+/* El ancho incluye el padding y el borde en todos los elementos. */
 * {
     box-sizing: border-box;
 }
 
+/* Fondo, color y fuente de toda la página. */
 body {
     margin: 0;
     background: var(--fondo);
@@ -48,6 +51,7 @@ body {
     line-height: 1.5;
 }
 
+/* Cabecera con el título centrado. */
 header {
     padding: 1.5rem 1rem;
     background: var(--primario);
@@ -60,6 +64,7 @@ header h1 {
     font-size: clamp(1.7rem, 4vw, 2.4rem);
 }
 
+/* Contenido principal: secciones en columna y centradas. */
 main {
     display: grid;
     gap: 1.25rem;
@@ -67,6 +72,7 @@ main {
     margin: 2rem auto;
 }
 
+/* Cada sección es una caja blanca con borde y sombra. */
 main section {
     padding: 1.5rem;
     background: var(--superficie);
@@ -75,17 +81,20 @@ main section {
     box-shadow: var(--sombra);
 }
 
+/* Títulos de cada sección. */
 h2 {
     margin: 0 0 1.25rem;
     font-size: 1.35rem;
 }
 
 /* Formularios y controles */
+/* Formulario en una columna; el campo es etiqueta + control + error. */
 form {
     display: grid;
     gap: 0.9rem 1rem;
 }
 
+/* Cada campo: etiqueta, control y mensaje de error en columna. */
 .campo {
     display: flex;
     flex-direction: column;
@@ -101,6 +110,7 @@ label {
     font-weight: 600;
 }
 
+/* Los controles heredan la fuente y ocupan todo el ancho. */
 input,
 select,
 textarea,
@@ -124,6 +134,7 @@ select {
     min-height: 44px;
 }
 
+/* Foco visible para poder navegar con teclado y campo inválido en rojo. */
 input:focus,
 select:focus,
 textarea:focus,
@@ -137,6 +148,7 @@ select.invalido {
     border-color: var(--peligro);
 }
 
+/* Botones: estilo común, con variante secundaria. */
 button,
 .btn-importar {
     display: inline-flex;
@@ -165,6 +177,7 @@ button:hover,
     background: #454d52;
 }
 
+/* Área de texto JSON y fila de botones. */
 #json-area {
     min-height: 180px;
     margin: 0.35rem 0 0.75rem;
@@ -200,7 +213,8 @@ button:hover,
 
 #json-mensaje,
 #preferencias-mensaje,
-#ayuda-mensaje {
+#ayuda-mensaje,
+#primer-menor-mensaje {
     min-height: 1.5rem;
     margin: 0.75rem 0 0;
     font-weight: 600;
