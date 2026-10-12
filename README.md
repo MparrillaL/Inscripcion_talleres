@@ -112,6 +112,6 @@ Web para gestionar las inscripciones de un evento. Se pueden añadir y borrar pa
 
 ## Uso de la IA
 
-- Enlace al chat: _pendiente de añadir_
+- Enlace al chat: (https://gemini.google.com/share/d/1wSWhD5W5hQUthZEVcHowogTHPkyQPAuW?usp=sharing)
 
 
