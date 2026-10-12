@@ -1,85 +1,260 @@
+// logica.js: validación y cálculos. Ninguna función de este archivo toca el DOM.
 
-const CLAVE_STORAGE = "participantes_talleres"
+const EDAD_MAYORIA = 18;
 
-// Array inicial con tres participantes para que haya datos al cargar la página.
-export const participantesPorDefecto = [
-    {
-        id: 483721,
-        nombre: "Ana García",
-        edad: 17,
-        tipo: "estudiante",
-        modalidad: "presencial",
-        fechaInscripcion: "2026-10-08T08:30:00.000Z",
-        experiencia: 2.5
-    },
-    {
-        id: 102938,
-        nombre: "Carlos Pérez",
-        edad: 29,
-        tipo: "profesional",
-        modalidad: "online",
-        fechaInscripcion: "2026-10-09T10:15:00.000Z",
-        experiencia: 6.0
-    },
-    {
-        id: 593821,
-        nombre: "Elena Gómez",
-        edad: 42,
-        tipo: "invitado",
-        modalidad: "presencial",
-        fechaInscripcion: "2026-10-10T11:00:00.000Z",
-        experiencia: 8.5
-    }
-];
+// Devuelve una copia nueva de los tres participantes de ejemplo.
+export function crearParticipantesEjemplo() {
+    return [
+        {
+            id: 483721,
+            nombre: "Ana García",
+            edad: 17,
+            tipo: "estudiante",
+            modalidad: "presencial",
+            experiencia: 2.5,
+            fechaInscripcion: "2026-10-08T08:30:00.000Z"
+        },
+        {
+            id: 102938,
+            nombre: "Carlos Pérez",
+            edad: 29,
+            tipo: "profesional",
+            modalidad: "online",
+            experiencia: 6,
+            fechaInscripcion: "2026-10-09T10:15:00.000Z"
+        },
+        {
+            id: 593821,
+            nombre: "Elena Gómez",
+            edad: 42,
+            tipo: "invitado",
+            modalidad: "presencial",
+            experiencia: 8.5,
+            fechaInscripcion: "2026-10-10T11:00:00.000Z"
+        }
+    ];
+}
 
-// Normaliza los datos del formulario para guardar el participante limpio.
+// Convierte los textos del formulario en un participante limpio (ya validado).
 export function normalizarParticipante(datos) {
     return {
-        nombre: datos.nombre.trim(),
-        edad: Number(datos.edad.trim()),
-        tipo: datos.tipo.trim().toLowerCase(),
-        modalidad: datos.modalidad.trim().toLowerCase(),
-        experiencia: Number(datos.experiencia.trim())
+        nombre: String(datos.nombre ?? "").trim(),
+        edad: Number(String(datos.edad ?? "").trim()),
+        tipo: String(datos.tipo ?? ""),
+        modalidad: String(datos.modalidad ?? ""),
+        experiencia: Number(String(datos.experiencia ?? "").trim())
     };
 }
 
-// Comprueba si los datos del formulario son válidos.
+// Valida los datos (siempre no fiables). Devuelve { valido, errores } con un mensaje por campo.
 export function validarParticipante(datos) {
-    let esValido = true;
+    const errores = {};
+    const origen = datos ?? {};
 
-    const participanteNormalizado = normalizarParticipante(datos);
-
-    // Number("") vale 0, así que las cadenas vacías se rechazan antes de convertir.
-    if (datos.edad.trim() === "" || datos.experiencia.trim() === "") {
-        esValido = false;
+    // Nombre: entre 2 y 60 caracteres sin contar espacios de los extremos.
+    const nombre = String(origen.nombre ?? "").trim();
+    if (nombre.length < 2 || nombre.length > 60) {
+        errores.nombre = "El nombre debe tener entre 2 y 60 caracteres.";
     }
 
-    // El nombre debe tener entre 2 y 60 caracteres.
-    if (participanteNormalizado.nombre.length < 2 || participanteNormalizado.nombre.length > 60) {
-        esValido = false;
+    // Edad: se comprueba el texto antes de convertir, porque Number("") es 0 y Number("18abc") es NaN.
+    const edadTexto = String(origen.edad ?? "").trim();
+    if (edadTexto === "") {
+        errores.edad = "La edad es obligatoria.";
+    } else if (!/^\d+$/.test(edadTexto)) {
+        errores.edad = "La edad debe ser un número entero, sin letras ni decimales.";
+    } else {
+        const edad = Number(edadTexto);
+        if (!Number.isFinite(edad) || !Number.isInteger(edad) || edad < 0 || edad > 120) {
+            errores.edad = "La edad debe estar entre 0 y 120.";
+        }
     }
 
-    // La edad debe ser un número entero entre 0 y 120.
-    if (!Number.isInteger(participanteNormalizado.edad) || participanteNormalizado.edad < 0 || participanteNormalizado.edad > 120) {
-        esValido = false;
+    // Tipo: solo los valores permitidos (switch porque hay varias opciones válidas).
+    switch (origen.tipo) {
+        case "estudiante":
+        case "profesional":
+        case "invitado":
+            break;
+        default:
+            errores.tipo = "Elige un tipo: estudiante, profesional o invitado.";
     }
 
-    // El tipo debe ser uno de los permitidos.
-    if (participanteNormalizado.tipo !== "estudiante" && participanteNormalizado.tipo !== "profesional" && participanteNormalizado.tipo !== "invitado") {
-        esValido = false;
+    // Modalidad: presencial u online.
+    if (origen.modalidad !== "presencial" && origen.modalidad !== "online") {
+        errores.modalidad = "Elige una modalidad: presencial u online.";
     }
 
-    // La modalidad debe ser presencial o online.
-    if (participanteNormalizado.modalidad !== "presencial" && participanteNormalizado.modalidad !== "online") {
-        esValido = false;
+    // Experiencia: número (con decimales con punto) entre 0 y 10.
+    const experienciaTexto = String(origen.experiencia ?? "").trim();
+    if (experienciaTexto === "") {
+        errores.experiencia = "La experiencia es obligatoria.";
+    } else if (!/^\d+(\.\d+)?$/.test(experienciaTexto)) {
+        errores.experiencia = "La experiencia debe ser un número (usa punto para los decimales).";
+    } else {
+        const experiencia = Number(experienciaTexto);
+        if (!Number.isFinite(experiencia) || experiencia < 0 || experiencia > 10) {
+            errores.experiencia = "La experiencia debe estar entre 0 y 10.";
+        }
     }
 
-    // La experiencia debe ser un número válido y estar entre 0 y 10.
-    if (isNaN(participanteNormalizado.experiencia) || !isFinite(participanteNormalizado.experiencia) || participanteNormalizado.experiencia < 0 || participanteNormalizado.experiencia > 10) {
-        esValido = false;
+    return { valido: Object.keys(errores).length === 0, errores };
+}
+
+// Genera un id aleatorio de 6 cifras que no esté en uso; con tope de intentos para no bloquear la pestaña.
+export function generarId(participantes) {
+    const MAX_INTENTOS = 100;
+    let intentos = 0;
+
+    while (intentos < MAX_INTENTOS) {
+        const candidato = Math.floor(Math.random() * 900000) + 100000;
+        let repetido = false;
+
+        for (const participante of participantes) {
+            if (participante.id === candidato) {
+                repetido = true;
+                break;
+            }
+        }
+
+        if (!repetido) {
+            return candidato;
+        }
+        intentos++;
     }
 
-    return esValido;
+    return null;
+}
+
+export function obtenerClasificacionEdad(edad) {
+    return edad < EDAD_MAYORIA ? "Menor de edad" : "Mayor de edad";
+}
+
+export function obtenerClasificacionExperiencia(experiencia) {
+    if (experiencia < 4) {
+        return "Inicial";
+    } else if (experiencia < 7) {
+        return "Intermedia";
+    }
+    return "Avanzada";
+}
+
+// Búsqueda por nombre sin distinguir mayúsculas ni minúsculas.
+export function filtrarPorNombre(lista, texto) {
+    const buscado = texto.trim().toLowerCase();
+    const resultado = [];
+
+    for (const participante of lista) {
+        if (participante.nombre.toLowerCase().includes(buscado)) {
+            resultado.push(participante);
+        }
+    }
+    return resultado;
+}
+
+export function filtrarPorModalidad(lista, modalidad) {
+    const resultado = [];
+
+    for (const participante of lista) {
+        if (participante.modalidad === modalidad) {
+            resultado.push(participante);
+        }
+    }
+    return resultado;
+}
+
+// Media de experiencia de los presenciales; null si no hay ninguno.
+export function calcularExperienciaMediaPresencial(participantes) {
+    let suma = 0;
+    let presenciales = 0;
+
+    for (const participante of participantes) {
+        if (participante.modalidad === "online") {
+            continue; // los online no cuentan
+        }
+        suma += participante.experiencia;
+        presenciales++;
+    }
+
+    return presenciales === 0 ? null : suma / presenciales;
+}
+
+// Primer menor de edad en el orden de la colección; null si no hay ninguno.
+export function buscarPrimerMenor(participantes) {
+    let encontrado = null;
+
+    for (const participante of participantes) {
+        if (participante.edad < EDAD_MAYORIA) {
+            encontrado = participante;
+            break; // ya no hace falta seguir
+        }
+    }
+    return encontrado;
+}
+
+// Estadísticas de toda la colección. Las medias y extremos son null cuando no hay datos.
+export function calcularEstadisticas(participantes) {
+    const estadisticas = {
+        total: 0,
+        menores: 0,
+        mayores: 0,
+        edadMedia: null,
+        edadMinima: null,
+        edadMaxima: null,
+        porModalidad: { presencial: 0, online: 0 },
+        porTipo: { estudiante: 0, profesional: 0, invitado: 0 },
+        experienciaMediaPresencial: null
+    };
+    let sumaEdades = 0;
+
+    for (const participante of participantes) {
+        estadisticas.total++;
+        sumaEdades += participante.edad;
+
+        if (participante.edad < EDAD_MAYORIA) {
+            estadisticas.menores++;
+        } else {
+            estadisticas.mayores++;
+        }
+
+        if (estadisticas.edadMinima === null || participante.edad < estadisticas.edadMinima) {
+            estadisticas.edadMinima = participante.edad;
+        }
+        if (estadisticas.edadMaxima === null || participante.edad > estadisticas.edadMaxima) {
+            estadisticas.edadMaxima = participante.edad;
+        }
+
+        if (participante.modalidad === "online") {
+            estadisticas.porModalidad.online++;
+        } else {
+            estadisticas.porModalidad.presencial++;
+        }
+
+        switch (participante.tipo) {
+            case "estudiante":
+                estadisticas.porTipo.estudiante++;
+                break;
+            case "profesional":
+                estadisticas.porTipo.profesional++;
+                break;
+            case "invitado":
+                estadisticas.porTipo.invitado++;
+                break;
+        }
+    }
+
+    if (estadisticas.total > 0) {
+        estadisticas.edadMedia = sumaEdades / estadisticas.total;
+    }
+    estadisticas.experienciaMediaPresencial = calcularExperienciaMediaPresencial(participantes);
+
+    return estadisticas;
+}
+
+// Comprueba que un texto es una fecha en formato ISO tal y como la genera toISOString().
+function esFechaISO(texto) {
+    const fecha = new Date(texto);
+    return !Number.isNaN(fecha.getTime()) && fecha.toISOString() === texto;
 }
 
 // Valida una colección importada: devuelve el mensaje de error o null si es correcta.
@@ -108,29 +283,27 @@ export function validarColeccionImportada(datos) {
             return prefijo + "faltan campos numéricos o tienen un tipo incorrecto.";
         }
 
-        const datosFormulario = {
+        // Se reutilizan las reglas del formulario pasando los números como texto.
+        const resultado = validarParticipante({
             nombre: elemento.nombre,
             edad: String(elemento.edad),
             tipo: elemento.tipo,
             modalidad: elemento.modalidad,
             experiencia: String(elemento.experiencia)
-        };
-
-        if (!validarParticipante(datosFormulario)) {
+        });
+        if (!resultado.valido) {
             return prefijo + "algún valor está fuera de rango o no está permitido.";
         }
 
         if (!Number.isInteger(elemento.id) || elemento.id < 100000 || elemento.id > 999999) {
             return prefijo + "el id debe ser un entero entre 100000 y 999999.";
         }
-
         if (idsVistos.has(elemento.id)) {
             return prefijo + "el id está repetido.";
         }
         idsVistos.add(elemento.id);
 
-        const fecha = new Date(elemento.fechaInscripcion);
-        if (Number.isNaN(fecha.getTime()) || fecha.toISOString() !== elemento.fechaInscripcion) {
+        if (!esFechaISO(elemento.fechaInscripcion)) {
             return prefijo + "la fecha no es un texto ISO válido.";
         }
     }
@@ -138,146 +311,59 @@ export function validarColeccionImportada(datos) {
     return null;
 }
 
-// Genera un identificador aleatorio y único para cada participante.
-export function generarId(participantes) {
-    let intentos = 1;
+// Mensaje que la página principal envía al panel del iframe.
+export function crearResumenPanel(participantes) {
+    const estadisticas = calcularEstadisticas(participantes);
+    let masReciente = null;
 
-    while (intentos <= 100) {
-        const newID = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
-        const encontrado = participantes.find(participante => participante.id === newID);
-
-        // Si el ID no existe, lo devolvemos.
-        if (encontrado === undefined) {
-            return newID;
-        }
-
-        intentos++;
-    }
-
-    console.error("Error: Se ha alcanzado el límite de 100 intentos sin generar un ID único.");
-    return null;
-}
-
-// Devuelve si la persona es menor o mayor de edad.
-export function obtenerClasificacionEdad(edad) {
-    if (edad < 18) {
-        return "Menor de edad";
-    }
-    return "Mayor de edad";
-}
-
-// Devuelve el nivel de experiencia según los años.
-export function obtenerClasificacionExperiencia(experiencia) {
-    if (experiencia < 4) {
-        return "Inicial";
-    } else if (experiencia < 7) {
-        return "Intermedia";
-    }
-    return "Avanzada";
-}
-
-// Filtra los participantes por nombre.
-export function filtrarPorNombre(lista, nombre) {
-    const resultado = [];
-
-    for (const participante of lista) {
-        if (participante.nombre.toLowerCase().includes(nombre.toLowerCase())) {
-            resultado.push(participante);
+    for (const participante of participantes) {
+        if (masReciente === null ||
+            new Date(participante.fechaInscripcion).getTime() > new Date(masReciente.fechaInscripcion).getTime()) {
+            masReciente = participante;
         }
     }
 
-    return resultado;
+    return {
+        tipo: "resumen",
+        total: estadisticas.total,
+        presencial: estadisticas.porModalidad.presencial,
+        online: estadisticas.porModalidad.online,
+        ultimo: masReciente === null
+            ? null
+            : { nombre: masReciente.nombre, fecha: masReciente.fechaInscripcion }
+    };
 }
 
-// Filtra los participantes por modalidad.
-export function filtrarPorModalidad(lista, modalidad) {
-    const resultado = [];
-
-    for (const participante of lista) {
-        if (participante.modalidad.toLowerCase() === modalidad.toLowerCase()) {
-            resultado.push(participante);
-        }
-    }
-
-    return resultado;
+function esEnteroNoNegativo(valor) {
+    return typeof valor === "number" && Number.isInteger(valor) && valor >= 0;
 }
 
-// Cuenta cuántos inscritos hay.
-export function totalInscritos(lista) {
-    let total = 0;
-
-    for (const participante of lista) {
-        total++;
+// El panel no se fía de nadie: comprueba estructura, tipos y valores del mensaje.
+export function validarMensajeResumen(datos) {
+    if (datos === null || typeof datos !== "object" || Array.isArray(datos)) {
+        return false;
+    }
+    if (datos.tipo !== "resumen") {
+        return false;
+    }
+    if (!esEnteroNoNegativo(datos.total) || !esEnteroNoNegativo(datos.presencial) ||
+        !esEnteroNoNegativo(datos.online)) {
+        return false;
+    }
+    if (datos.presencial + datos.online !== datos.total) {
+        return false;
     }
 
-    return total;
+    if (datos.ultimo === null) {
+        return datos.total === 0;
+    }
+
+    const ultimo = datos.ultimo;
+    if (datos.total === 0 || typeof ultimo !== "object" || Array.isArray(ultimo)) {
+        return false;
+    }
+    if (typeof ultimo.nombre !== "string" || ultimo.nombre.length < 2 || ultimo.nombre.length > 60) {
+        return false;
+    }
+    return typeof ultimo.fecha === "string" && esFechaISO(ultimo.fecha);
 }
-
-// Calcula el porcentaje de un tipo respecto al total.
-export function porcentajePorTipo(lista, tipo) {
-    const total = totalInscritos(lista);
-
-    if (total === 0) {
-        return 0;
-    }
-
-    let cantidad = 0;
-
-    for (const participante of lista) {
-        if (participante.tipo.toLowerCase() === tipo.toLowerCase()) {
-            cantidad++;
-        }
-    }
-
-    return (cantidad / total) * 100;
-}
-
-// Calcula la experiencia media del grupo.
-export function experienciaMedia(lista) {
-    if (lista.length === 0) {
-        return 0;
-    }
-
-    let total = 0;
-
-    for (const participante of lista) {
-        total += participante.experiencia;
-    }
-
-    return total / lista.length;
-}
-
-// Devuelve el participante con más experiencia.
-export function participanteVeterano(lista) {
-    if (lista.length === 0) {
-        return null;
-    }
-
-    let veterano = lista[0];
-
-    for (const participante of lista) {
-        if (participante.experiencia > veterano.experiencia) {
-            veterano = participante;
-        }
-    }
-
-    return veterano;
-}
-export function cargarDeStorage() {
-    const datos = localStorage.getItem(CLAVE_STORAGE);
-    if (datos) {
-        try {
-            return JSON.parse(datos);
-        } catch (e) {
-            console.error("Error al parsear los datos del storage", e);
-        }
-    }
-    return participantesPorDefecto;
-}
-
-export const participantes = cargarDeStorage();
-
-export function guardarEnStorage() {
-    localStorage.setItem(CLAVE_STORAGE, JSON.stringify(participantes));
-}
-

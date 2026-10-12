@@ -1,33 +1,39 @@
 :root {
     --fondo: #f5f4ef;
+    --fondo-suave: #f7f8f5;
     --superficie: #ffffff;
     --texto: #263238;
-    --texto-secundario: #5f6b70;
-    --borde: #dce2df;
+    --texto-secundario: #4d5a60;
+    --borde: #c9d2ce;
     --primario: #176b62;
     --primario-hover: #10564f;
+    --titulo: #176b62;
     --acento: #d99632;
     --peligro: #b64040;
+    --peligro-hover: #963333;
     --sombra: 0 4px 14px rgb(38 50 56 / 7%);
-    --fondo-suave: #f7f8f5;
 }
 
-body[data-theme="oscuro"] {
+/* Tema oscuro: se activa con data-tema="oscuro" en <html> (lo pone preferencias.js). */
+:root[data-tema="oscuro"] {
     --fondo: #111827;
+    --fondo-suave: #0f172a;
     --superficie: #1f2937;
     --texto: #f3f4f6;
     --texto-secundario: #d1d5db;
-    --borde: #374151;
-    --primario: #3ca9a0;
-    --primario-hover: #2d8d86;
+    --borde: #4b5563;
+    --primario: #2a8f87;
+    --primario-hover: #23776f;
+    --titulo: #7fd6cd;
     --acento: #f4b860;
-    --peligro: #f87171;
+    --peligro: #c0392b;
+    --peligro-hover: #a02f23;
     --sombra: 0 4px 16px rgb(0 0 0 / 35%);
-    --fondo-suave: #0f172a;
 }
 
-body[data-size="grande"] {
-    font-size: 18px;
+/* Tamaño de letra grande: al cambiar el tamaño base escalan todos los rem. */
+:root[data-tamano="grande"] {
+    font-size: 125%;
 }
 
 * {
@@ -40,7 +46,6 @@ body {
     color: var(--texto);
     font-family: Arial, Helvetica, sans-serif;
     line-height: 1.5;
-    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 header {
@@ -75,41 +80,68 @@ h2 {
     font-size: 1.35rem;
 }
 
+/* Formularios y controles */
 form {
     display: grid;
-    gap: 0.65rem 1rem;
+    gap: 0.9rem 1rem;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 0.5rem;
+}
+
+form .campo {
+    margin-bottom: 0;
 }
 
 label {
-    align-self: end;
     font-weight: 600;
 }
 
 input,
 select,
+textarea,
 button {
     font: inherit;
 }
 
 input,
-select {
+select,
+textarea {
     width: 100%;
-    min-height: 44px;
     padding: 0.65rem 0.75rem;
     color: var(--texto);
-    background: #ffffff;
+    background: var(--superficie);
     border: 1px solid var(--borde);
     border-radius: 6px;
 }
 
+input,
+select {
+    min-height: 44px;
+}
+
 input:focus,
 select:focus,
+textarea:focus,
 button:focus-visible {
-    outline: 3px solid rgb(23 107 98 / 25%);
+    outline: 3px solid var(--acento);
     outline-offset: 2px;
 }
 
-button {
+input.invalido,
+select.invalido {
+    border-color: var(--peligro);
+}
+
+button,
+.btn-importar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-height: 44px;
     padding: 0.65rem 1rem;
     color: #ffffff;
@@ -120,84 +152,43 @@ button {
     cursor: pointer;
 }
 
-button:hover {
+button:hover,
+.btn-importar:hover {
     background: var(--primario-hover);
 }
 
 .btn-secundario {
-    background: #6c757d;
+    background: #5d676d;
 }
 
 .btn-secundario:hover {
-    background: #525a61;
-}
-
-.btn-importar {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 44px;
-    padding: 0.65rem 1rem;
-    background: var(--primario);
-    color: #ffffff;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
+    background: #454d52;
 }
 
 #json-area {
-    width: 100%;
     min-height: 180px;
-    margin-bottom: 0.75rem;
-    padding: 0.75rem;
-    border: 1px solid var(--borde);
-    border-radius: 8px;
+    margin: 0.35rem 0 0.75rem;
     resize: vertical;
-    font: inherit;
 }
 
-#json-mensaje {
-    min-height: 1.5rem;
-    margin: 0.75rem 0 0;
-    font-weight: 600;
-}
-
-#json-mensaje.error {
-    color: var(--peligro);
-}
-
-.acciones-json,
-.acciones-preferencias {
+.acciones {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
 }
 
-body.tema-oscuro {
-    background: #111827;
-    color: #f3f4f6;
+/* Mensajes de error y estado */
+.error-campo {
+    min-height: 1.2rem;
+    color: var(--peligro);
+    font-size: 0.9rem;
+    font-weight: 600;
 }
 
-body.tema-oscuro main section {
-    background: #1f2937;
-    color: #f3f4f6;
-    border-color: #374151;
-}
-
-body.tema-oscuro input,
-body.tema-oscuro select,
-body.tema-oscuro textarea {
-    background: #111827;
-    color: #f3f4f6;
-    border-color: #374151;
-}
-
-body.tamano-grande {
-    font-size: 1.08rem;
-}
-
-form button {
-    margin-top: 0.5rem;
+:root[data-tema="oscuro"] .error-campo,
+:root[data-tema="oscuro"] #errores,
+:root[data-tema="oscuro"] .error {
+    color: #ff9d94;
 }
 
 #errores {
@@ -207,49 +198,26 @@ form button {
     font-weight: 600;
 }
 
-#preferencias {
-    display: grid;
-    gap: 1rem;
+#json-mensaje,
+#preferencias-mensaje,
+#ayuda-mensaje {
+    min-height: 1.5rem;
+    margin: 0.75rem 0 0;
+    font-weight: 600;
 }
 
-.preferencias-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
+.error {
+    color: var(--peligro);
 }
 
-.label-preferencia {
-    margin: 0 0 0.5rem;
-    font-weight: 700;
-    color: var(--texto);
+#preferencias .campo {
+    max-width: 320px;
 }
 
-.opcion-preferencia {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-right: 1rem;
-    color: var(--texto-secundario);
-}
-
-#btn-reset-preferencias {
-    justify-self: start;
-    background: var(--texto-secundario);
-}
-
-#btn-reset-preferencias:hover {
-    background: var(--texto);
-}
-
-/* Búsqueda y filtros */
-#busqueda {
-    margin-bottom: 1rem;
-}
-
-/* Dashboard de estadísticas */
+/* Estadísticas */
 #estadisticas {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
     gap: 1rem;
     border-top: 4px solid var(--acento);
 }
@@ -263,11 +231,10 @@ form button {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 0.75rem;
+    gap: 0.5rem;
     min-width: 0;
-    min-height: 110px;
     margin: 0;
-    padding: 1.1rem;
+    padding: 1rem;
     color: var(--texto-secundario);
     background: var(--fondo-suave);
     border: 1px solid var(--borde);
@@ -284,26 +251,38 @@ form button {
 }
 
 /* Listado de participantes */
-#tarjetas {
-    display: block;
-}
-
 .lista-participantes {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: 1rem;
 }
 
+#sin-resultados {
+    margin: 0 0 1rem;
+    color: var(--texto-secundario);
+    font-weight: 600;
+}
+
 .tarjeta {
     padding: 1rem;
-    background: #fbfcfa;
+    background: var(--fondo-suave);
     border: 1px solid var(--borde);
+    border-left: 5px solid var(--primario);
     border-radius: 8px;
+}
+
+/* Estados de la tarjeta según la clasificación */
+.tarjeta-menor {
+    border-left-color: var(--acento);
+}
+
+.experiencia-avanzada h3::after {
+    content: " \2605";
 }
 
 .tarjeta h3 {
     margin: 0 0 0.75rem;
-    color: var(--primario);
+    color: var(--titulo);
     font-size: 1.1rem;
 }
 
@@ -312,25 +291,38 @@ form button {
     color: var(--texto-secundario);
 }
 
-.tarjeta button {
+.tarjeta .btn-borrar {
     width: 100%;
     margin-top: 0.75rem;
     background: var(--peligro);
 }
 
-.tarjeta button:hover {
-    background: #963333;
+.tarjeta .btn-borrar:hover {
+    background: var(--peligro-hover);
 }
 
-/* Ajustes para móviles */
-@media (max-width: 520px) {
-    main section {
-        padding: 1.1rem;
-    }
+/* Iframe del panel */
+#panel-evento {
+    width: 100%;
+    height: 220px;
+    border: 1px solid var(--borde);
+    border-radius: 8px;
+    background: #ffffff;
+}
 
-    #estadisticas {
-        grid-template-columns: 1fr;
-    }
+/* Páginas panel.html y ayuda.html */
+.pagina-panel {
+    padding: 0.75rem 1rem;
+    background: #ffffff;
+    color: #263238;
+}
+
+.pagina-panel p {
+    margin: 0.35rem 0;
+}
+
+.pagina-ayuda main {
+    margin: 1rem auto;
 }
 
 /* Distribución en pantallas amplias */
@@ -342,8 +334,10 @@ form button {
     form button {
         grid-column: 1 / -1;
     }
+}
 
-    #busqueda {
-        margin-bottom: 0.75rem;
+@media (max-width: 520px) {
+    main section {
+        padding: 1.1rem;
     }
 }

@@ -3,106 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscripción Talleres</title>
+    <title>Gestor de participantes del evento</title>
     <link rel="stylesheet" href="./css/estilos.css">
     <script type="module" src="./js/app.js"></script>
 </head>
 <body>
     <header>
-        <h1>Inscripción a Talleres</h1>
+        <h1>Gestor de participantes del evento</h1>
     </header>
 
     <main>
-        <!-- Formulario de Inscripción -->
+        <!-- Alta de participantes: la validación la hace JavaScript, por eso novalidate -->
         <section>
-            <h2>Formulario de Inscripción</h2>
-            <form id="formulario">
-                <label for="nombre">Nombre:</label>
-                <input type="text" id="nombre" name="nombre" required>
+            <h2>Formulario de inscripción</h2>
+            <form id="formulario" novalidate>
+                <div class="campo">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" autocomplete="off">
+                    <span class="error-campo" id="error-nombre" role="alert"></span>
+                </div>
 
-                <label for="edad">Edad:</label>
-                <input type="number" id="edad" name="edad" required>
+                <div class="campo">
+                    <label for="edad">Edad:</label>
+                    <input type="text" id="edad" name="edad" inputmode="numeric" autocomplete="off">
+                    <span class="error-campo" id="error-edad" role="alert"></span>
+                </div>
 
-                <label for="tipo">Tipo:</label>
-                <select id="tipo" name="tipo" required>
-                    <option value="estudiante">Estudiante</option>
-                    <option value="profesional">Profesional</option>
-                    <option value="invitado">Invitado</option>
-                </select>
+                <div class="campo">
+                    <label for="tipo">Tipo:</label>
+                    <select id="tipo" name="tipo">
+                        <option value="estudiante">Estudiante</option>
+                        <option value="profesional">Profesional</option>
+                        <option value="invitado">Invitado</option>
+                    </select>
+                    <span class="error-campo" id="error-tipo" role="alert"></span>
+                </div>
 
-                <label for="modalidad">Modalidad:</label>
-                <select id="modalidad" name="modalidad" required>
-                    <option value="presencial">Presencial</option>
-                    <option value="online">Online</option>
-                </select>
+                <div class="campo">
+                    <label for="modalidad">Modalidad:</label>
+                    <select id="modalidad" name="modalidad">
+                        <option value="presencial">Presencial</option>
+                        <option value="online">Online</option>
+                    </select>
+                    <span class="error-campo" id="error-modalidad" role="alert"></span>
+                </div>
 
-                <label for="experiencia">Experiencia (años):</label>
-                <input type="number" id="experiencia" name="experiencia" required>
+                <div class="campo">
+                    <label for="experiencia">Experiencia (años, con punto decimal):</label>
+                    <input type="text" id="experiencia" name="experiencia" inputmode="decimal" autocomplete="off">
+                    <span class="error-campo" id="error-experiencia" role="alert"></span>
+                </div>
 
                 <button type="submit">Inscribirse</button>
             </form>
-            <div id="errores"></div>
+            <div id="errores" role="alert"></div>
         </section>
 
-        <!-- Búsqueda y Filtros -->
+        <!-- Búsqueda y filtros -->
         <section>
             <h2>Buscar participantes</h2>
-            <label for="busqueda">Buscar por nombre:</label>
-            <input type="text" id="busqueda" placeholder="Escribe un nombre">
+            <div class="campo">
+                <label for="busqueda">Buscar por nombre:</label>
+                <input type="text" id="busqueda" placeholder="Escribe un nombre" autocomplete="off">
+            </div>
 
-            <label for="filtro-modalidad">Filtrar por modalidad:</label>
-            <select id="filtro-modalidad">
-                <option value="todas">Todas</option>
-                <option value="presencial">Presencial</option>
-                <option value="online">Online</option>
-            </select>
+            <div class="campo">
+                <label for="filtro-modalidad">Filtrar por modalidad:</label>
+                <select id="filtro-modalidad">
+                    <option value="todas">Todas</option>
+                    <option value="presencial">Presencial</option>
+                    <option value="online">Online</option>
+                </select>
+            </div>
         </section>
 
-        <!-- Panel de Estadísticas (Añadido) -->
+        <!-- Estadísticas de la colección completa -->
         <section id="estadisticas">
-            <h2>Estadísticas del Evento</h2>
-            <p>Total inscritos: <span id="stat-total">0</span></p>
-            <p>Porcentajes por tipo: <span id="stat-porcentajes">Estudiantes: 0%, Profesionales: 0%, Invitados: 0%</span></p>
-            <p>Experiencia media (Presencial): <span id="stat-exp-presencial">0 años</span></p>
-            <p>Participante más veterano/a: <span id="stat-veterano">Ninguno</span></p>
+            <h2>Estadísticas del evento</h2>
+            <p>Total de participantes: <span id="stat-total">0</span></p>
+            <p>Menores de edad: <span id="stat-menores">0</span></p>
+            <p>Mayores de edad: <span id="stat-mayores">0</span></p>
+            <p>Edad media: <span id="stat-edad-media">Sin datos</span></p>
+            <p>Edad mínima: <span id="stat-edad-min">Sin datos</span></p>
+            <p>Edad máxima: <span id="stat-edad-max">Sin datos</span></p>
+            <p>Presenciales: <span id="stat-presencial">0</span></p>
+            <p>Online: <span id="stat-online">0</span></p>
+            <p>Estudiantes: <span id="stat-estudiantes">0</span></p>
+            <p>Profesionales: <span id="stat-profesionales">0</span></p>
+            <p>Invitados: <span id="stat-invitados">0</span></p>
+            <p>Experiencia media (presenciales): <span id="stat-exp-presencial">Sin datos</span></p>
         </section>
 
-        <!-- Listado de Tarjetas -->
+        <!-- Listado de tarjetas -->
         <section id="tarjetas">
-            <h2>Participantes Inscritos</h2>
+            <h2>Participantes inscritos</h2>
+            <p id="sin-resultados" role="status" hidden></p>
+            <div id="lista-participantes" class="lista-participantes"></div>
         </section>
 
-        <!-- Gestión de JSON y Persistencia -->
+        <!-- Panel del evento: recibe los datos por postMessage -->
+        <section id="panel-seccion">
+            <h2>Panel del evento</h2>
+            <iframe id="panel-evento" src="./panel.html" title="Panel del evento: resumen de inscripciones"></iframe>
+        </section>
+
+        <!-- Intercambio de datos en JSON -->
         <section id="gestion-datos">
-            <h2>Gestión de Datos</h2>
-            <textarea id="json-area" rows="8" placeholder="Exporta o importa un JSON aquí..."></textarea>
-            <div class="acciones-json">
+            <h2>Gestión de datos (JSON)</h2>
+            <label for="json-area">Colección en formato JSON:</label>
+            <textarea id="json-area" rows="8" placeholder="Pulsa Exportar o pega aquí un JSON para importarlo"></textarea>
+            <div class="acciones">
                 <button id="btn-exportar" type="button">Exportar a JSON</button>
                 <button id="btn-importar-texto" type="button">Importar desde el área de texto</button>
                 <label class="btn-importar" for="input-importar">Importar desde archivo</label>
-                <input type="file" id="input-importar" accept=".json" hidden>
+                <input type="file" id="input-importar" accept=".json,application/json" hidden>
             </div>
             <p id="json-mensaje" role="status"></p>
         </section>
 
+        <!-- Preferencias guardadas en cookies -->
         <section id="preferencias">
             <h2>Preferencias</h2>
-            <label for="tema">Tema:</label>
-            <select id="tema">
-                <option value="claro">Claro</option>
-                <option value="oscuro">Oscuro</option>
-            </select>
+            <div class="campo">
+                <label for="tema">Tema:</label>
+                <select id="tema">
+                    <option value="claro">Claro</option>
+                    <option value="oscuro">Oscuro</option>
+                </select>
+            </div>
 
-            <label for="tamano">Tamaño de letra:</label>
-            <select id="tamano">
-                <option value="normal">Normal</option>
-                <option value="grande">Grande</option>
-            </select>
+            <div class="campo">
+                <label for="tamano">Tamaño de letra:</label>
+                <select id="tamano">
+                    <option value="normal">Normal</option>
+                    <option value="grande">Grande</option>
+                </select>
+            </div>
 
-            <div class="acciones-preferencias">
+            <div class="acciones">
                 <button id="guardar-preferencias" type="button">Guardar preferencias</button>
                 <button id="reset-preferencias" type="button" class="btn-secundario">Restablecer</button>
             </div>
+            <p id="preferencias-mensaje" role="status"></p>
+        </section>
+
+        <!-- Ayuda en ventana aparte -->
+        <section id="ayuda">
+            <h2>Ayuda</h2>
+            <div class="acciones">
+                <button id="btn-abrir-ayuda" type="button">Abrir ayuda</button>
+                <button id="btn-cerrar-ayuda" type="button" class="btn-secundario">Cerrar ayuda</button>
+            </div>
+            <p id="ayuda-mensaje" role="status"></p>
         </section>
     </main>
 </body>
