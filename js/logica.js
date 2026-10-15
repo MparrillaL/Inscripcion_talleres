@@ -177,7 +177,6 @@ export function filtrarPorModalidad(lista, modalidad) {
     }
     return resultado;
 }
-
 // Media de experiencia de los presenciales; null si no hay ninguno.
 export function calcularExperienciaMediaPresencial(participantes) {
     // Acumuladores: suma de experiencias y número de presenciales.

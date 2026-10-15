@@ -50,7 +50,6 @@ function cargarElementos() {
     ui.btnCerrarAyuda = document.getElementById("btn-cerrar-ayuda");
     ui.ayudaMensaje = document.getElementById("ayuda-mensaje");
 
-    // Si falta algún elemento se avisa en consola.
     // Si falta algo imprescindible se avisa en consola en lugar de romper con un TypeError.
     for (const clave of Object.keys(ui)) {
         if (ui[clave] === null) {
@@ -235,6 +234,7 @@ function actualizarEstadisticas() {
     ponerTexto("stat-invitados", String(stats.porTipo.invitado));
     ponerTexto("stat-exp-presencial", formatearMedia(stats.experienciaMediaPresencial));
 }
+
 
 // Muestra el nombre del primer menor de edad de la colección o avisa de que no hay.
 function mostrarPrimerMenor() {
